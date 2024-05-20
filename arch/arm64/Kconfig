@@ -101,7 +101,6 @@ config ARM64
 	select DCACHE_WORD_ACCESS
 	select DMA_DIRECT_REMAP
 	select EDAC_SUPPORT
-	select FRAME_POINTER
 	select GENERIC_ALLOCATOR
 	select GENERIC_ARCH_TOPOLOGY
 	select GENERIC_CLOCKEVENTS
@@ -1956,7 +1955,7 @@ config CC_HAVE_STACKPROTECTOR_SYSREG
 	def_bool $(cc-option,-mstack-protector-guard=sysreg -mstack-protector-guard-reg=sp_el0 -mstack-protector-guard-offset=0)
 
 config STACKPROTECTOR_PER_TASK
-	def_bool y
+	def_bool n
 	depends on STACKPROTECTOR && CC_HAVE_STACKPROTECTOR_SYSREG
 
 endmenu
