@@ -99,8 +99,6 @@ static void bcm_aggregate(struct qcom_icc_bcm *bcm, bool init)
 		if (bcm->enable_mask && (bcm->vote_x[bucket] || bcm->vote_y[bucket])) {
 			bcm->vote_x[bucket] = 0;
 			bcm->vote_y[bucket] = bcm->enable_mask;
-			if (perf_mode[bucket])
-				bcm->vote_y[bucket] |= bcm->perf_mode_mask;
 		}
 	}
 

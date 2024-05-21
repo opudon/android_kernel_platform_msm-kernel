@@ -240,8 +240,7 @@ config ARCH_USE_QUEUED_SPINLOCKS
 	bool
 
 config QUEUED_SPINLOCKS
-	def_bool y if ARCH_USE_QUEUED_SPINLOCKS
-	depends on SMP
+	def_bool y
 
 config BPF_ARCH_SPINLOCK
 	bool
@@ -250,8 +249,7 @@ config ARCH_USE_QUEUED_RWLOCKS
 	bool
 
 config QUEUED_RWLOCKS
-	def_bool y if ARCH_USE_QUEUED_RWLOCKS
-	depends on SMP
+	def_bool y
 
 config ARCH_HAS_MMIOWB
 	bool
