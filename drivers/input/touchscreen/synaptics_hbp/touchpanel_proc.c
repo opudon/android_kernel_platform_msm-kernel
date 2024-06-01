@@ -20,6 +20,7 @@
 #include "touchpanel_autotest/touchpanel_autotest.h"
 #include "touch_comon_api/touch_comon_api.h"
 #include "synaptics_touchcom_func_base.h"
+#include "synaptics_touchcom_core_dev.h"
 #include "syna_tcm2.h"
 
 /*irq_depth - For enable or disable irq
@@ -554,6 +555,53 @@ static int health_monitor_open(struct inode *inode, struct file *file)
 
 DECLARE_PROC_OPS(tp_health_monitor_proc_fops, health_monitor_open, seq_read, health_monitor_control, single_release);
 
+/*double_tap - For touch panel dt2w
+ * Output:
+ * 0, DT2W disabled;
+ * 1, DT2W enabled;
+ */
+static ssize_t proc_double_tap_read(struct file *file, char __user *buffer,
+				     size_t count, loff_t *ppos)
+{
+	uint8_t ret = 0;
+	char page[PAGESIZE] = {0};
+	struct syna_tcm *tcm = PDE_DATA(file_inode(file));
+
+	snprintf(page, PAGESIZE - 1, "%u", tcm->dou_tap);
+	ret = simple_read_from_buffer(buffer, count, ppos, page, strlen(page));
+
+	return ret;
+}
+
+/*double_tap - For touch panel dt2w
+ * Input:
+ * 0, DT2W disabled;
+ * 1, DT2W enabled;
+ */
+static ssize_t proc_double_tap_write(struct file *file,
+				      const char __user *buffer, size_t count, loff_t *ppos)
+{
+	int tmp = 0;
+	char buf[4] = {0};
+	struct syna_tcm *tcm = PDE_DATA(file_inode(file));
+
+
+	tp_copy_from_user(buf, sizeof(buf), buffer, count, 2);
+
+	if (kstrtoint(buf, 10, &tmp)) {
+		TPD_INFO("%s: kstrtoint error\n", __func__);
+		return count;
+	}
+
+	tcm->dou_tap = tmp;
+
+	LOGE("%d: Dt2w status\n", tcm->dou_tap);
+
+	return count;
+}
+
+DECLARE_PROC_OPS(proc_double_tap_fops, simple_open, proc_double_tap_read, proc_double_tap_write, NULL);
+
 /*proc/touchpanel/debug_info/main_register*/
 static int tp_main_register_read_func(struct seq_file *s, void *v)
 {
@@ -687,6 +735,9 @@ int init_touchpanel_proc(struct syna_tcm *tcm,
 		},
 		{
 			"baseline_result", 0666, NULL, &tp_auto_test_result_fops, tcm, false, true
+		},
+		{
+			"double_tap_enable", 0666, NULL, &proc_double_tap_fops, tcm, false, true
 		},
 		{
 			"framework_mode", 0666, NULL, &tp_framework_mode_proc_fops, tcm, false, true

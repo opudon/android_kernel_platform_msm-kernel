@@ -629,6 +629,7 @@ struct syna_tcm {
 	bool freq_hop_simulate_support;                     /*frequency hopping simulate feature*/
 
 	unsigned short gesture_type;
+	unsigned int dou_tap;
 	unsigned short touch_and_hold;
 	bool is_fp_down;
 	struct fp_underscreen_info fp_info;	/*tp info used for underscreen fingerprint*/
@@ -782,6 +783,21 @@ void syna_send_signal(struct syna_tcm *tcm, int signal_num);
  *    on success, 0; otherwise, negative value on error.
  */
 int syna_dev_enable_lowpwr_gesture(struct syna_tcm *tcm, bool en);
+
+
+/**
+ * syna_dev_set_gesture_type()
+ *
+ * set gesture type
+ *
+ * @param
+ *    [ in] tcm: tcm driver handle
+ *    [ in] value: gesture type
+ *
+ * @return
+ *    on success, 0; otherwise, negative value on error.
+ */
+int syna_dev_set_gesture_type(struct syna_tcm *tcm, unsigned short value);
 
 /**
  * @brief: Helpers for chardev nodes and sysfs nodes creation

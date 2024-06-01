@@ -1758,6 +1758,7 @@ static int syna_cdev_ioctl_send_message(struct syna_tcm *tcm,
 	unsigned int payload_length = 0;
 	unsigned int delay_ms_resp = RESP_IN_POLLING;
 	struct tcm_buffer resp_data_buf;
+	unsigned char dou;
 
 	if (!tcm->is_connected) {
 		LOGE("Not connected\n");
@@ -1824,16 +1825,23 @@ retry:
 		delay_ms_resp = g_sysfs_io_polling_interval;
 
 	if ((data[0] == CMD_SET_DYNAMIC_CONFIG) && (payload_length == 3)) {
-		if (data[3] == DC_GESTURE_TYPE_ENABLE) {
-			tcm->gesture_type = (unsigned short)syna_pal_le2_to_uint(&data[4]);
-			syna_dev_update_lpwg_status(tcm);
-			syna_sysfs_set_fingerprint_prepare(tcm);
-			LOGI("HBP set gesture_type(0x%04x)\n", tcm->gesture_type);
-		} else if (data[3] == DC_TOUCH_AND_HOLD) {
+		if (data[3] == DC_TOUCH_AND_HOLD) {
+			dou = (tcm->dou_tap == 1) ? (unsigned char) 0x0001 : (unsigned char) 0x2000;
+		   	tcm->gesture_type = (unsigned short)syna_pal_le2_to_uint(&dou);
 			tcm->touch_and_hold = (unsigned short)syna_pal_le2_to_uint(&data[4]);
 			syna_dev_update_lpwg_status(tcm);
 			syna_sysfs_set_fingerprint_prepare(tcm);
 			LOGI("HBP set touch_and_hold(0x%04x)\n", tcm->touch_and_hold);
+			LOGI("HBP set gesture_type(0x%04x)\n", tcm->gesture_type);
+			data[3] = DC_GESTURE_TYPE_ENABLE;
+			retval = syna_tcm_send_command(tcm->tcm_dev,
+					data[0],
+					&data[3],
+					payload_length,
+					&resp_code,
+					&resp_data_buf,
+					delay_ms_resp);
+			data[3] = DC_TOUCH_AND_HOLD;
 		}
 	}
 
