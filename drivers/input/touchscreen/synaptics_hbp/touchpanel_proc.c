@@ -584,6 +584,7 @@ static ssize_t proc_double_tap_write(struct file *file,
 	int tmp = 0;
 	char buf[4] = {0};
 	struct syna_tcm *tcm = PDE_DATA(file_inode(file));
+	unsigned char dou;
 
 
 	tp_copy_from_user(buf, sizeof(buf), buffer, count, 2);
@@ -594,8 +595,16 @@ static ssize_t proc_double_tap_write(struct file *file,
 	}
 
 	tcm->dou_tap = tmp;
+	dou = (tcm->dou_tap == 1) ? (unsigned char) 0x0001 : (unsigned char) 0x2000;
+	tcm->gesture_type = (unsigned short)syna_pal_le2_to_uint(&dou);
+	syna_dev_set_gesture_type(tcm, tcm->gesture_type);
+	syna_dev_update_lpwg_status(tcm);
+	syna_tcm_set_dynamic_config(tcm->tcm_dev,
+		0xFE,
+		tcm->gesture_type,
+		RESP_IN_ATTN);
 
-	LOGE("%d: Dt2w status\n", tcm->dou_tap);
+	LOGE("Dt2w status: %d\n", tcm->dou_tap);
 
 	return count;
 }
