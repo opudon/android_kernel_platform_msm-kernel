@@ -381,6 +381,8 @@ static ssize_t proc_coordinate_read(struct file *file, char __user *buffer,
 		 Point_2nd.x, Point_2nd.y, \
 		 Point_3rd.x, Point_3rd.y, \
 		 Point_4th.x, Point_4th.y);
+	
+	touch_data->g_type = gesture_type;
 
 	ret = snprintf(page, PAGE_SIZE - 1,
 		       "%u,%d:%d,%d:%d,%d:%d,%d:%d,%d:%d,%d:%d,%u\n", gesture_type,

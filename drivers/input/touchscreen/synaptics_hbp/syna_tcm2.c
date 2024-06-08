@@ -596,9 +596,9 @@ static void syna_dev_report_input_events(struct syna_tcm *tcm)
 				input_report_key(input_dev, KEY_WAKEUP, 0);
 				input_sync(input_dev);
 			} else {
-				input_report_key(input_dev, KEY_F4, 1); 
+				input_report_key(input_dev, 264 + touch_data->g_type, 1); 
 				input_sync(input_dev);
-				input_report_key(input_dev, KEY_F4, 0);
+				input_report_key(input_dev, 264 + touch_data->g_type, 0);
 				input_sync(input_dev);
 			}
 		}
